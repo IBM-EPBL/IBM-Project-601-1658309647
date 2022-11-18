@@ -51,3 +51,30 @@ def addSales(
         else:
             # print("Error While Adding the User ! ")
             return "database error"
+
+
+def getSales(userid, con):
+    sql = "Select * from SALES where USERID = '" + userid + "'"
+    arr = []
+    try:
+        stmt = ibm_db.exec_immediate(con, sql)
+        dictionary = ibm_db.fetch_assoc(stmt)
+        if dictionary != False:
+            arr.append("success")
+            # arr.append({"message": "success"})
+            while dictionary != False:
+                arr.append(dictionary)
+                dictionary = ibm_db.fetch_assoc(stmt)
+            return arr
+        else:
+            print("No data is found !")
+            arr.append("no data")
+            arr.append(dictionary)
+            return arr
+    except Exception as e:
+        print(e)
+        print("Error while retrying data !")
+        arr.append("database errors")
+        arr.append({})
+        return arr
+    return arr

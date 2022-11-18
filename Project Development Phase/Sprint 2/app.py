@@ -296,6 +296,33 @@ def addSales():
     return jsonify({"message": "Something went wrong", "status": False}), 500
 
 
+@app.route("/api/getSales", methods=["GET", "POST"])
+def getSales():
+    if request.method == "GET":
+        userid = str(request.args.get("userid") or "")
+        if userid:
+            flag = salesController.getSales(userid, con)
+            if flag[0] == "no data":
+                error = "no sales list available"
+                return jsonify({"message": error, "status": False})
+            elif flag[0] == "database error":
+                error = "Error while retrying the data !"
+                return jsonify({"message": error, "status": False})
+            elif flag[0] == "success":
+                user = flag[1]
+                res = []
+                for i in range(0, len(flag)):
+                    res.append(flag[i])
+                res.pop(0)
+                return jsonify(res)
+        else:
+            return (
+                jsonify({"message": "All Fields are REQUIRED !", "status": False}),
+                400,
+            )
+    return jsonify({"message": "Something went wrong", "status": False}), 500
+
+
 # Running app
 if __name__ == "__main__":
     app.run(debug=True)
