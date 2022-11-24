@@ -1,4 +1,0 @@
-flask
-ibm_db
-sendgrid
-flask_session
