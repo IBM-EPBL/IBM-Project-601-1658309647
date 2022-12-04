@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request, json
-import datetime
 from connect import connection
 from controllers import user
 from controllers import product
 from controllers import customer
 from controllers import sales
+from flask_cors import CORS, cross_origin
 import uuid
 
 con = connection.Connection()
@@ -15,14 +15,15 @@ salesController = sales
 
 # Initializing flask app
 app = Flask(__name__)
-
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route("/", methods=["GET"])
+@cross_origin()
 def helloworld():
     if request.method == "GET":
         data = {"message": "success"}
         return jsonify(data)
-
 
 @app.route("/user/login", methods=["GET", "POST"])
 def userLogin():
@@ -48,6 +49,8 @@ def userLogin():
             )
     return jsonify({"message": "Something went wrong"})
 
+
+# userSignup API 
 
 @app.route("/user/signup", methods=["GET", "POST"])
 def userSignup():
@@ -78,6 +81,7 @@ def userSignup():
             )
     return jsonify({"message": "Something went wrong", "status": False}), 500
 
+# addproduct
 
 @app.route("/api/addproduct", methods=["GET", "POST"])
 def addProducts():
@@ -325,4 +329,4 @@ def getSales():
 
 # Running app
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
