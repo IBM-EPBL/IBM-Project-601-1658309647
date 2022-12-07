@@ -41,7 +41,7 @@ def userLogin():
                 return jsonify({"message": error, "status": False})
             elif flag[0] == "success":
                 user = flag[1]
-                return jsonify({"message": "LOGIN SUCCESSFULLY"})
+                return jsonify({"message": "LOGIN SUCCESSFULLY","userid":user[4],"email":user[2],"name":user[1]})
         else:
             return (
                 jsonify({"message": "All Fields are REQUIRED !", "status": False}),
@@ -327,6 +327,54 @@ def getSales():
     return jsonify({"message": "Something went wrong", "status": False}), 500
 
 
+@app.route("/api/getDashboard", methods=["GET", "POST"])
+def getDashboard():
+    if request.method == "GET":
+        arr=[]
+        userid = str(request.args.get("userid") or "")
+        if userid:
+            flag = custController.getCustomer(userid,con)
+            if flag[0] == "no data":
+                arr.append({"customer":"0"})
+            elif flag[0] == "database error":
+                error = "Error while retrying the data !"
+                return jsonify({"message": error, "status": False})
+            elif flag[0] == "success":
+                arr.append({"customer":str(len(flag)-1)})
+                
+
+            flag = productController.getProduct(userid, con)
+            if flag[0] == "no data":
+                arr.append({"products":"0"})
+            elif flag[0] == "database error":
+                error = "Error while retrying the data !"
+                return jsonify({"message": error, "status": False})
+            elif flag[0] == "success":
+                arr.append({"products":str(len(flag)-1)})
+
+
+            flag = salesController.getSales(userid, con)
+            if flag[0] == "no data":
+                arr.append({"sales":"0"})
+            elif flag[0] == "database error":
+                error = "Error while retrying the data !"
+                return jsonify({"message": error, "status": False})
+            elif flag[0] == "success":
+                arr.append({"sales":str(len(flag)-1)})
+
+
+
+            return jsonify(arr)
+
+        else:
+            return (
+                    jsonify({"message":"All Fields are REQUIRED !","status":False}),
+                    400
+                    )
+    else:
+        return jsonify({"message": "Something went wrong", "status": False}), 500
+
+
 # Running app
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
